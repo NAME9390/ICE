@@ -1,13 +1,11 @@
-/*
- * ICE Operating System - PS/2 Keyboard Implementation
- */
+ 
 
 #include "keyboard.h"
 #include "pic.h"
 #include "vga.h"
 #include "../cpu/idt.h"
 
-/* I/O helpers */
+ 
 static inline void outb(u16 port, u8 value) {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
@@ -18,30 +16,30 @@ static inline u8 inb(u16 port) {
     return ret;
 }
 
-/* Keyboard state */
+ 
 static volatile bool shift_pressed = false;
 static volatile bool ctrl_pressed = false;
 static volatile bool caps_lock = false;
 
-/* Input buffer */
+ 
 #define KB_BUFFER_SIZE 256
 static char kb_buffer[KB_BUFFER_SIZE];
 static volatile int kb_read_idx = 0;
 static volatile int kb_write_idx = 0;
 
-/* US keyboard layout - lowercase */
+ 
 static const char scancode_to_char[] = {
-    0,    0x1B, '1',  '2',  '3',  '4',  '5',  '6',   /* 0x00-0x07 */
-    '7',  '8',  '9',  '0',  '-',  '=',  '\b', '\t',  /* 0x08-0x0F */
-    'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',   /* 0x10-0x17 */
-    'o',  'p',  '[',  ']',  '\n', 0,    'a',  's',   /* 0x18-0x1F */
-    'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',   /* 0x20-0x27 */
-    '\'', '`',  0,    '\\', 'z',  'x',  'c',  'v',   /* 0x28-0x2F */
-    'b',  'n',  'm',  ',',  '.',  '/',  0,    '*',   /* 0x30-0x37 */
-    0,    ' ',  0,    0,    0,    0,    0,    0,     /* 0x38-0x3F */
+    0,    0x1B, '1',  '2',  '3',  '4',  '5',  '6',    
+    '7',  '8',  '9',  '0',  '-',  '=',  '\b', '\t',   
+    'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',    
+    'o',  'p',  '[',  ']',  '\n', 0,    'a',  's',    
+    'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',    
+    '\'', '`',  0,    '\\', 'z',  'x',  'c',  'v',    
+    'b',  'n',  'm',  ',',  '.',  '/',  0,    '*',    
+    0,    ' ',  0,    0,    0,    0,    0,    0,      
 };
 
-/* US keyboard layout - shifted */
+ 
 static const char scancode_to_char_shift[] = {
     0,    0x1B, '!',  '@',  '#',  '$',  '%',  '^',
     '&',  '*',  '(',  ')',  '_',  '+',  '\b', '\t',
@@ -53,7 +51,7 @@ static const char scancode_to_char_shift[] = {
     0,    ' ',  0,    0,    0,    0,    0,    0,
 };
 
-/* Buffer operations */
+ 
 static void kb_buffer_put(char c) {
     int next = (kb_write_idx + 1) % KB_BUFFER_SIZE;
     if (next != kb_read_idx) {
@@ -71,7 +69,7 @@ static char kb_buffer_get(void) {
     return c;
 }
 
-/* Keyboard interrupt handler */
+ 
 static void keyboard_handler(interrupt_frame_t *frame) {
     (void)frame;
     
@@ -79,7 +77,7 @@ static void keyboard_handler(interrupt_frame_t *frame) {
     bool released = scancode & 0x80;
     scancode &= 0x7F;
     
-    /* Handle modifiers */
+     
     if (scancode == KEY_LSHIFT || scancode == KEY_RSHIFT) {
         shift_pressed = !released;
         return;
@@ -95,10 +93,10 @@ static void keyboard_handler(interrupt_frame_t *frame) {
         return;
     }
     
-    /* Only process key press, not release */
+     
     if (released) return;
     
-    /* Convert scancode to character */
+     
     char c = 0;
     if (scancode < sizeof(scancode_to_char)) {
         bool use_shift = shift_pressed ^ caps_lock;
@@ -111,10 +109,10 @@ static void keyboard_handler(interrupt_frame_t *frame) {
 }
 
 void keyboard_init(void) {
-    /* Register handler */
+     
     idt_register_handler(33, keyboard_handler);
     
-    /* Unmask IRQ1 */
+     
     pic_unmask_irq(IRQ_KEYBOARD);
 }
 

@@ -1,10 +1,4 @@
-/*
- * ICE Operating System - General Process Manager (gpm)
- * System inspection, management, and executable tools
- * 
- * gpm does NOT touch hardware directly.
- * All operations go through EXC API to MPM.
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,12 +14,10 @@
 
 #define ICE_VERSION "1.0.0"
 
-/* Forward declarations */
+ 
 int mef_main(int argc, char *argv[]);
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ============================================================================ */
+ 
 
 static void print_usage(void) {
     printf("ICE General Process Manager\n");
@@ -53,9 +45,7 @@ static exec_id_t parse_exec_id(const char *str) {
     return id;
 }
 
-/* ============================================================================
- * COMMANDS
- * ============================================================================ */
+ 
 
 static int cmd_version(void) {
     printf("ICE Operating System v%s\n", ICE_VERSION);
@@ -105,7 +95,7 @@ static int cmd_mem(void) {
 }
 
 static int cmd_clear(void) {
-    /* ANSI clear screen */
+     
     printf("\033[2J\033[H");
     fflush(stdout);
     return 0;
@@ -148,7 +138,7 @@ static int cmd_color(int scheme) {
         return 1;
     }
     
-    /* Apply color scheme */
+     
     tty_set_color_scheme(scheme);
     printf("Color scheme set to %d\n", scheme);
     
@@ -198,7 +188,7 @@ static int cmd_list(void) {
     
     for (size_t i = 0; i < count; i++) {
         if (!reg[i].valid) continue;
-        if (reg[i].flags & EXC_FLAG_HIDDEN) continue; /* Hide kernel executables */
+        if (reg[i].flags & EXC_FLAG_HIDDEN) continue;  
         
         char id_str[16];
         snprintf(id_str, sizeof(id_str), EXEC_ID_FORMAT, reg[i].id);
@@ -212,12 +202,10 @@ static int cmd_list(void) {
     return 0;
 }
 
-/* ============================================================================
- * MAIN
- * ============================================================================ */
+ 
 
 int gpm_main(int argc, char *argv[]) {
-    /* Initialize MPM if needed */
+     
     mpm_init();
     
     if (argc < 2) {

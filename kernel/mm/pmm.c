@@ -1,12 +1,9 @@
-/*
- * ICE Operating System - Physical Memory Manager
- * Bitmap-based page allocator for Multiboot1
- */
+ 
 
 #include "pmm.h"
 #include "../drivers/vga.h"
 
-/* Multiboot1 info structure */
+ 
 typedef struct {
     u32 flags;
     u32 mem_lower;
@@ -20,7 +17,7 @@ typedef struct {
     u32 mmap_addr;
 } multiboot_info_t;
 
-/* Multiboot memory map entry */
+ 
 typedef struct __attribute__((packed)) {
     u32 size;
     u64 addr;
@@ -32,14 +29,14 @@ typedef struct __attribute__((packed)) {
 #define MBOOT_FLAG_MMAP     (1 << 6)
 #define MBOOT_FLAG_MEM      (1 << 0)
 
-/* Memory bitmap */
-#define MAX_PAGES (256 * 1024)  /* Support up to 1GB */
+ 
+#define MAX_PAGES (256 * 1024)   
 static u8 page_bitmap[MAX_PAGES / 8];
 
 static u32 total_pages = 0;
 static u32 used_pages = 0;
 
-/* Bitmap operations */
+ 
 static inline void bitmap_set(u32 page) {
     page_bitmap[page / 8] |= (1 << (page % 8));
 }
@@ -52,7 +49,7 @@ static inline bool bitmap_test(u32 page) {
     return page_bitmap[page / 8] & (1 << (page % 8));
 }
 
-/* Mark range as used */
+ 
 static void mark_range_used(phys_addr_t start, u32 size) {
     u32 start_page = start / PAGE_SIZE;
     u32 end_page = (start + size + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -65,7 +62,7 @@ static void mark_range_used(phys_addr_t start, u32 size) {
     }
 }
 
-/* Mark range as free */
+ 
 static void mark_range_free(phys_addr_t start, u32 size) {
     u32 start_page = start / PAGE_SIZE;
     u32 end_page = (start + size) / PAGE_SIZE;
@@ -82,14 +79,14 @@ static void mark_range_free(phys_addr_t start, u32 size) {
 void pmm_init(void *mboot_info) {
     multiboot_info_t *mbi = (multiboot_info_t*)mboot_info;
     
-    /* Start with all memory marked as used */
+     
     for (u32 i = 0; i < sizeof(page_bitmap); i++) {
         page_bitmap[i] = 0xFF;
     }
     used_pages = MAX_PAGES;
     total_pages = 0;
     
-    /* Use memory map if available */
+     
     if (mbi->flags & MBOOT_FLAG_MMAP) {
         mboot_mmap_entry_t *entry = (mboot_mmap_entry_t*)mbi->mmap_addr;
         u32 end = mbi->mmap_addr + mbi->mmap_length;
@@ -103,27 +100,27 @@ void pmm_init(void *mboot_info) {
             entry = (mboot_mmap_entry_t*)((u32)entry + entry->size + 4);
         }
     } else if (mbi->flags & MBOOT_FLAG_MEM) {
-        /* Fallback to basic memory info */
+         
         u32 upper_kb = mbi->mem_upper;
         mark_range_free(0x100000, upper_kb * 1024);
     }
     
-    /* Reserve low memory (0-1MB) for BIOS/kernel */
+     
     mark_range_used(0, 0x100000);
     
-    /* Reserve kernel space (1MB-2MB) */
+     
     mark_range_used(0x100000, 0x100000);
 }
 
 phys_addr_t pmm_alloc_page(void) {
-    for (u32 i = 256; i < MAX_PAGES; i++) {  /* Start after 1MB */
+    for (u32 i = 256; i < MAX_PAGES; i++) {   
         if (!bitmap_test(i)) {
             bitmap_set(i);
             used_pages++;
             return i * PAGE_SIZE;
         }
     }
-    return 0;  /* Out of memory */
+    return 0;   
 }
 
 void pmm_free_page(phys_addr_t addr) {

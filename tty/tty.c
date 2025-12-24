@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - TTY Implementation
- * Arch-style TTY with ANSI color support
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,9 +8,7 @@
 
 #include "tty.h"
 
-/* ============================================================================
- * STATE
- * ============================================================================ */
+ 
 
 static struct {
     int initialized;
@@ -22,18 +17,16 @@ static struct {
     int current_bg;
 } tty_state = {0};
 
-/* Color scheme definitions: {fg, bg} */
+ 
 static const int color_schemes[5][2] = {
-    {TTY_WHITE, TTY_BLACK},     /* 0: unused */
-    {TTY_WHITE, TTY_BLACK},     /* 1: Default - white on black */
-    {TTY_GREEN, TTY_BLACK},     /* 2: Dark - green on black */
-    {TTY_BLACK, TTY_WHITE},     /* 3: Light - black on white */
-    {TTY_WHITE, TTY_BLACK},     /* 4: Mono - white on black */
+    {TTY_WHITE, TTY_BLACK},      
+    {TTY_WHITE, TTY_BLACK},      
+    {TTY_GREEN, TTY_BLACK},      
+    {TTY_BLACK, TTY_WHITE},      
+    {TTY_WHITE, TTY_BLACK},      
 };
 
-/* ============================================================================
- * INIT/SHUTDOWN
- * ============================================================================ */
+ 
 
 int tty_init(void) {
     if (tty_state.initialized) return 0;
@@ -43,7 +36,7 @@ int tty_init(void) {
     tty_state.current_bg = color_schemes[1][1];
     tty_state.initialized = 1;
     
-    /* Apply default colors */
+     
     tty_reset_color();
     
     return 0;
@@ -56,9 +49,7 @@ void tty_shutdown(void) {
     tty_state.initialized = 0;
 }
 
-/* ============================================================================
- * COLOR MANAGEMENT
- * ============================================================================ */
+ 
 
 int tty_set_color_scheme(int scheme) {
     if (scheme < 1 || scheme > 4) return -1;
@@ -67,7 +58,7 @@ int tty_set_color_scheme(int scheme) {
     tty_state.current_fg = color_schemes[scheme][0];
     tty_state.current_bg = color_schemes[scheme][1];
     
-    /* Apply colors */
+     
     printf("\033[%d;%dm", 30 + tty_state.current_fg, 40 + tty_state.current_bg);
     fflush(stdout);
     
@@ -83,9 +74,7 @@ void tty_reset_color(void) {
     fflush(stdout);
 }
 
-/* ============================================================================
- * SCREEN CONTROL
- * ============================================================================ */
+ 
 
 void tty_clear(void) {
     printf("\033[2J\033[H");
@@ -106,9 +95,7 @@ void tty_cursor_visible(int visible) {
     fflush(stdout);
 }
 
-/* ============================================================================
- * OUTPUT
- * ============================================================================ */
+ 
 
 int tty_printf(const char *format, ...) {
     va_list args;
@@ -120,16 +107,16 @@ int tty_printf(const char *format, ...) {
 }
 
 int tty_printf_color(int fg, int bg, const char *format, ...) {
-    /* Set color */
+     
     printf("\033[%d;%dm", 30 + fg, 40 + bg);
     
-    /* Print */
+     
     va_list args;
     va_start(args, format);
     int result = vprintf(format, args);
     va_end(args);
     
-    /* Reset to scheme colors */
+     
     printf("\033[%d;%dm", 30 + tty_state.current_fg, 40 + tty_state.current_bg);
     fflush(stdout);
     

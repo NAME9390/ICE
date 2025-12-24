@@ -1,38 +1,38 @@
-; ICE Operating System - ISR/IRQ Assembly Stubs
-; Interrupt entry points
+
+
 
 BITS 32
 
 extern isr_handler
 extern irq_handler
 
-; Macro for ISR without error code
+
 %macro ISR_NOERRCODE 1
 global isr%1
 isr%1:
-    push dword 0        ; Dummy error code
-    push dword %1       ; Interrupt number
+    push dword 0        
+    push dword %1       
     jmp isr_common_stub
 %endmacro
 
-; Macro for ISR with error code
+
 %macro ISR_ERRCODE 1
 global isr%1
 isr%1:
-    push dword %1       ; Interrupt number
+    push dword %1       
     jmp isr_common_stub
 %endmacro
 
-; Macro for IRQ
+
 %macro IRQ 2
 global irq%1
 irq%1:
-    push dword 0        ; Dummy error code
-    push dword %2       ; Interrupt number (32+)
+    push dword 0        
+    push dword %2       
     jmp irq_common_stub
 %endmacro
 
-; Exception handlers
+
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2
@@ -66,7 +66,7 @@ ISR_NOERRCODE 29
 ISR_ERRCODE   30
 ISR_NOERRCODE 31
 
-; IRQ handlers
+
 IRQ 0, 32
 IRQ 1, 33
 IRQ 2, 34
@@ -84,54 +84,54 @@ IRQ 13, 45
 IRQ 14, 46
 IRQ 15, 47
 
-; Syscall handler
+
 global isr128
 isr128:
     push dword 0
     push dword 128
     jmp isr_common_stub
 
-; Common ISR stub
+
 isr_common_stub:
-    ; Save all registers
+    
     pusha
     
-    ; Save data segment
+    
     mov ax, ds
     push eax
     
-    ; Load kernel data segment
+    
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     
-    ; Push pointer to stack frame
+    
     push esp
     
-    ; Call C handler
+    
     call isr_handler
     
-    ; Remove stack frame pointer
+    
     add esp, 4
     
-    ; Restore data segment
+    
     pop eax
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     
-    ; Restore registers
+    
     popa
     
-    ; Remove error code and interrupt number
+    
     add esp, 8
     
     iret
 
-; Common IRQ stub
+
 irq_common_stub:
     pusha
     

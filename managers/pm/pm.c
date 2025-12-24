@@ -1,10 +1,4 @@
-/*
- * ICE Operating System - Process Manager (pm)
- * User-facing process management interface
- * 
- * pm does NOT touch hardware directly.
- * All operations go through EXC API to MPM.
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,9 +8,7 @@
 #include "../../mpm/core/mpm.h"
 #include "../../tty/tty.h"
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ============================================================================ */
+ 
 
 static void print_usage(void) {
     printf("ICE Process Manager\n");
@@ -33,10 +25,10 @@ static void print_usage(void) {
 static exec_id_t parse_exec_id(const char *str) {
     exec_id_t id = 0;
     if (str[0] == '#') {
-        /* Format: #00000001 */
+         
         id = (exec_id_t)strtoul(str + 1, NULL, 16);
     } else {
-        /* Plain number */
+         
         id = (exec_id_t)strtoul(str, NULL, 10);
     }
     return id;
@@ -52,9 +44,7 @@ static const char* state_to_string(proc_state_t state) {
     }
 }
 
-/* ============================================================================
- * COMMANDS
- * ============================================================================ */
+ 
 
 static int cmd_list_processes(void) {
     mpm_request_t req = {
@@ -152,16 +142,14 @@ static int cmd_exit(void) {
     return 0;
 }
 
-/* ============================================================================
- * MAIN
- * ============================================================================ */
+ 
 
 int pm_main(int argc, char *argv[]) {
-    /* Initialize MPM if needed */
+     
     mpm_init();
     
     if (argc < 2) {
-        /* Default: list processes */
+         
         return cmd_list_processes();
     }
     
@@ -184,7 +172,7 @@ int pm_main(int argc, char *argv[]) {
     } else if (strcmp(cmd, "exit") == 0) {
         return cmd_exit();
     } else if (strcmp(cmd, "val") == 0) {
-        /* Boot validation - implemented in boot/val.c */
+         
         printf("Running boot validation...\n");
         return mpm_validate_system();
     } else if (strcmp(cmd, "-h") == 0 || strcmp(cmd, "--help") == 0) {

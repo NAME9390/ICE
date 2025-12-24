@@ -1,19 +1,17 @@
-/*
- * ICE Operating System - IDT Implementation
- */
+ 
 
 #include "idt.h"
 #include "gdt.h"
 #include "../drivers/vga.h"
 
-/* IDT with 256 entries */
+ 
 static idt_entry_t idt[256];
 static idt_ptr_t idt_ptr;
 
-/* Interrupt handlers */
+ 
 static interrupt_handler_t handlers[256] = {0};
 
-/* Exception messages */
+ 
 static const char *exception_messages[] = {
     "Division By Zero",
     "Debug",
@@ -42,7 +40,7 @@ static const char *exception_messages[] = {
     "Reserved"
 };
 
-/* Set an IDT entry */
+ 
 static void idt_set_gate(u8 num, u32 base, u16 sel, u8 flags) {
     idt[num].offset_low = base & 0xFFFF;
     idt[num].offset_high = (base >> 16) & 0xFFFF;
@@ -51,7 +49,7 @@ static void idt_set_gate(u8 num, u32 base, u16 sel, u8 flags) {
     idt[num].type_attr = flags;
 }
 
-/* ISR stubs - defined in isr.asm */
+ 
 extern void isr0(void);
 extern void isr1(void);
 extern void isr2(void);
@@ -85,7 +83,7 @@ extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
 
-/* IRQ stubs */
+ 
 extern void irq0(void);
 extern void irq1(void);
 extern void irq2(void);
@@ -103,19 +101,19 @@ extern void irq13(void);
 extern void irq14(void);
 extern void irq15(void);
 
-/* Syscall stub */
+ 
 extern void isr128(void);
 
 void idt_init(void) {
     idt_ptr.limit = sizeof(idt) - 1;
     idt_ptr.base = (u32)&idt;
     
-    /* Clear IDT */
+     
     for (int i = 0; i < 256; i++) {
         idt_set_gate(i, 0, 0, 0);
     }
     
-    /* Set exception handlers (0-31) */
+     
     idt_set_gate(0, (u32)isr0, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(1, (u32)isr1, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(2, (u32)isr2, GDT_KERNEL_CODE, 0x8E);
@@ -149,7 +147,7 @@ void idt_init(void) {
     idt_set_gate(30, (u32)isr30, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(31, (u32)isr31, GDT_KERNEL_CODE, 0x8E);
     
-    /* Set IRQ handlers (32-47) */
+     
     idt_set_gate(32, (u32)irq0, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(33, (u32)irq1, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(34, (u32)irq2, GDT_KERNEL_CODE, 0x8E);
@@ -167,10 +165,10 @@ void idt_init(void) {
     idt_set_gate(46, (u32)irq14, GDT_KERNEL_CODE, 0x8E);
     idt_set_gate(47, (u32)irq15, GDT_KERNEL_CODE, 0x8E);
     
-    /* Syscall handler (int 0x80) - callable from ring 3 */
+     
     idt_set_gate(128, (u32)isr128, GDT_KERNEL_CODE, 0xEE);
     
-    /* Load IDT */
+     
     __asm__ volatile ("lidt %0" : : "m"(idt_ptr));
 }
 
@@ -178,31 +176,31 @@ void idt_register_handler(u8 n, interrupt_handler_t handler) {
     handlers[n] = handler;
 }
 
-/* Common interrupt handler - called from assembly */
+ 
 void isr_handler(interrupt_frame_t *frame) {
     if (handlers[frame->int_no]) {
         handlers[frame->int_no](frame);
     } else if (frame->int_no < 32) {
-        /* Unhandled exception */
+         
         vga_set_color(VGA_COLOR_WHITE, VGA_COLOR_RED);
         vga_puts("\n KERNEL PANIC: ");
         vga_puts(exception_messages[frame->int_no]);
         vga_puts("\n");
         vga_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
         
-        /* Halt */
+         
         __asm__ volatile ("cli; hlt");
     }
 }
 
-/* IRQ handler - called from assembly */
+ 
 void irq_handler(interrupt_frame_t *frame) {
-    /* Send EOI to PIC */
+     
     if (frame->int_no >= 40) {
-        /* Send to slave PIC */
+         
         __asm__ volatile ("outb %0, %1" : : "a"((u8)0x20), "Nd"((u16)0xA0));
     }
-    /* Send to master PIC */
+     
     __asm__ volatile ("outb %0, %1" : : "a"((u8)0x20), "Nd"((u16)0x20));
     
     if (handlers[frame->int_no]) {

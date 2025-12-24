@@ -34,8 +34,3 @@ make iso
 # Run ISO in QEMU
 make run-iso
 ```
-
-## Cross-Compiler (Optional)
-
-For a proper OS toolchain, build i686-elf-gcc:
-https://wiki.osdev.org/GCC_Cross-Compiler

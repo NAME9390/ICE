@@ -1,16 +1,11 @@
-/*
- * ICE Operating System - ANSI Escape Codes
- * Additional ANSI utilities
- */
+ 
 
 #include <stdio.h>
 #include "tty.h"
 
-/* ============================================================================
- * ANSI ESCAPE SEQUENCES
- * ============================================================================ */
+ 
 
-/* Text attributes */
+ 
 void ansi_bold(void) {
     printf("\033[1m");
 }
@@ -47,30 +42,28 @@ void ansi_reset(void) {
     printf("\033[0m");
 }
 
-/* ============================================================================
- * BOX DRAWING
- * ============================================================================ */
+ 
 
 void ansi_draw_box(int row, int col, int width, int height) {
-    /* Top left corner */
+     
     printf("\033[%d;%dH┌", row, col);
     
-    /* Top edge */
+     
     for (int i = 1; i < width - 1; i++) {
         printf("─");
     }
     printf("┐");
     
-    /* Sides */
+     
     for (int i = 1; i < height - 1; i++) {
         printf("\033[%d;%dH│", row + i, col);
         printf("\033[%d;%dH│", row + i, col + width - 1);
     }
     
-    /* Bottom left corner */
+     
     printf("\033[%d;%dH└", row + height - 1, col);
     
-    /* Bottom edge */
+     
     for (int i = 1; i < width - 1; i++) {
         printf("─");
     }
@@ -79,9 +72,7 @@ void ansi_draw_box(int row, int col, int width, int height) {
     fflush(stdout);
 }
 
-/* ============================================================================
- * PROGRESS BAR
- * ============================================================================ */
+ 
 
 void ansi_progress_bar(int row, int col, int width, int percent) {
     printf("\033[%d;%dH[", row, col);

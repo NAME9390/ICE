@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - MPM Kernel Core
- * Main Process Manager - The sole authority for all system operations
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,38 +12,34 @@
 #include "mpm.h"
 #include "../../EXC/format/exc.h"
 
-/* ============================================================================
- * KERNEL STATE
- * ============================================================================ */
+ 
 
 typedef struct {
     bool initialized;
     time_t boot_time;
     
-    /* Process table */
+     
     process_info_t processes[MAX_PROCESSES];
     int process_count;
     ice_pid_t next_pid;
     
-    /* Executable registry */
+     
     registry_entry_t registry[MAX_EXECUTABLES];
     int registry_count;
     exec_id_t next_exec_id;
     
-    /* Memory tracking (simulated) */
+     
     size_t total_memory;
     size_t used_memory;
     
-    /* TTY state */
+     
     int current_tty;
     int color_scheme;
 } kernel_state_t;
 
 static kernel_state_t kernel = {0};
 
-/* ============================================================================
- * AUTHORIZATION MATRIX
- * ============================================================================ */
+ 
 
 typedef struct {
     api_request_type_t type;
@@ -56,29 +49,29 @@ typedef struct {
 } auth_entry_t;
 
 static const auth_entry_t auth_matrix[] = {
-    /* Process API */
+     
     {API_PROCESS_LIST,      true,  true,  true},
     {API_PROCESS_KILL,      true,  true,  false},
     {API_PROCESS_RESTART,   true,  true,  false},
     {API_PROCESS_INFO,      true,  true,  true},
     
-    /* Exec API */
+     
     {API_EXEC_RUN,          true,  false, true},
     {API_EXEC_REGISTER,     true,  false, true},
     
-    /* Memory API */
+     
     {API_MEMORY_ALLOC,      true,  false, false},
     {API_MEMORY_FREE,       true,  false, false},
     {API_MEMORY_INFO,       true,  true,  true},
     
-    /* TTY API */
+     
     {API_TTY_BIND,          true,  false, false},
     {API_TTY_UNBIND,        true,  false, false},
     {API_TTY_WRITE,         true,  true,  true},
     {API_TTY_READ,          true,  true,  true},
     {API_TTY_COLOR,         true,  false, true},
     
-    /* FS API */
+     
     {API_FS_READ,           true,  true,  true},
     {API_FS_WRITE,          true,  true,  true},
     {API_FS_LIST,           true,  true,  true},
@@ -87,9 +80,7 @@ static const auth_entry_t auth_matrix[] = {
 
 #define AUTH_MATRIX_SIZE (sizeof(auth_matrix) / sizeof(auth_entry_t))
 
-/* ============================================================================
- * ERROR MESSAGES
- * ============================================================================ */
+ 
 
 static const char* error_messages[] = {
     [MPM_OK]                = "Success",
@@ -111,9 +102,7 @@ const char* mpm_error_string(mpm_error_t error) {
     return "Unknown error";
 }
 
-/* ============================================================================
- * AUTHORIZATION
- * ============================================================================ */
+ 
 
 bool mpm_authorize(api_request_type_t type, caller_type_t caller) {
     for (size_t i = 0; i < AUTH_MATRIX_SIZE; i++) {
@@ -128,9 +117,7 @@ bool mpm_authorize(api_request_type_t type, caller_type_t caller) {
     return false;
 }
 
-/* ============================================================================
- * INTERNAL HELPERS
- * ============================================================================ */
+ 
 
 static process_info_t* find_process_by_exec_id(exec_id_t exec_id) {
     for (int i = 0; i < kernel.process_count; i++) {
@@ -160,9 +147,7 @@ static int allocate_process_slot(void) {
     return -1;
 }
 
-/* ============================================================================
- * REQUEST HANDLERS
- * ============================================================================ */
+ 
 
 static mpm_response_t handle_process_list(const mpm_request_t *req) {
     mpm_response_t resp = {.error = MPM_OK};
@@ -190,7 +175,7 @@ static mpm_response_t handle_process_kill(const mpm_request_t *req) {
         return resp;
     }
     
-    /* Transition to ZOMBIE, then OFF */
+     
     proc->state = PROC_STATE_ZOMBIE;
     kernel.used_memory -= proc->memory_used;
     proc->memory_used = 0;
@@ -209,7 +194,7 @@ static mpm_response_t handle_process_restart(const mpm_request_t *req) {
         return resp;
     }
     
-    /* Kill and restart */
+     
     proc->state = PROC_STATE_ZOMBIE;
     proc->state = PROC_STATE_ON;
     
@@ -249,14 +234,14 @@ static mpm_response_t handle_exec_run(const mpm_request_t *req) {
         return resp;
     }
     
-    /* Allocate memory (simulated) */
-    size_t mem_needed = 4096; /* Base allocation */
+     
+    size_t mem_needed = 4096;  
     if (kernel.used_memory + mem_needed > kernel.total_memory) {
         resp.error = MPM_ERR_NO_MEMORY;
         return resp;
     }
     
-    /* Create process */
+     
     kernel.processes[slot].pid = kernel.next_pid++;
     kernel.processes[slot].exec_id = entry->id;
     kernel.processes[slot].state = PROC_STATE_ON;
@@ -282,7 +267,7 @@ static mpm_response_t handle_exec_register(const mpm_request_t *req) {
         return resp;
     }
     
-    /* Validate the executable exists */
+     
     if (access(req->params.exec.path, R_OK) != 0) {
         resp.error = MPM_ERR_NOT_FOUND;
         snprintf(resp.error_msg, MAX_ERROR_MSG, "File not found: %s",
@@ -290,14 +275,14 @@ static mpm_response_t handle_exec_register(const mpm_request_t *req) {
         return resp;
     }
     
-    /* Register the executable */
+     
     registry_entry_t *entry = &kernel.registry[kernel.registry_count];
     entry->id = kernel.next_exec_id++;
     strncpy(entry->path, req->params.exec.path, MAX_PATH_LEN - 1);
     entry->flags = req->params.exec.flags;
     entry->valid = true;
     
-    /* Extract name from path */
+     
     const char *name = strrchr(req->params.exec.path, '/');
     name = name ? name + 1 : req->params.exec.path;
     strncpy(entry->name, name, sizeof(entry->name) - 1);
@@ -333,9 +318,7 @@ static mpm_response_t handle_tty_color(const mpm_request_t *req) {
     return resp;
 }
 
-/* ============================================================================
- * MAIN REQUEST DISPATCHER
- * ============================================================================ */
+ 
 
 mpm_response_t mpm_process_request(const mpm_request_t *request) {
     mpm_response_t resp = {.error = MPM_ERR_INVALID_REQUEST};
@@ -346,7 +329,7 @@ mpm_response_t mpm_process_request(const mpm_request_t *request) {
         return resp;
     }
     
-    /* Check authorization */
+     
     if (!mpm_authorize(request->type, request->caller)) {
         resp.error = MPM_ERR_UNAUTHORIZED;
         snprintf(resp.error_msg, MAX_ERROR_MSG,
@@ -355,7 +338,7 @@ mpm_response_t mpm_process_request(const mpm_request_t *request) {
         return resp;
     }
     
-    /* Dispatch to handler */
+     
     switch (request->type) {
         case API_PROCESS_LIST:
             return handle_process_list(request);
@@ -381,9 +364,7 @@ mpm_response_t mpm_process_request(const mpm_request_t *request) {
     }
 }
 
-/* ============================================================================
- * INITIALIZATION & SHUTDOWN
- * ============================================================================ */
+ 
 
 int mpm_init(void) {
     if (kernel.initialized) {
@@ -395,7 +376,7 @@ int mpm_init(void) {
     kernel.boot_time = time(NULL);
     kernel.next_pid = 1;
     kernel.next_exec_id = 1;
-    kernel.total_memory = 1024 * 1024 * 256; /* 256 MB simulated */
+    kernel.total_memory = 1024 * 1024 * 256;  
     kernel.used_memory = 0;
     kernel.current_tty = 0;
     kernel.color_scheme = 1;
@@ -405,7 +386,7 @@ int mpm_init(void) {
 }
 
 void mpm_shutdown(void) {
-    /* Kill all processes */
+     
     for (int i = 0; i < kernel.process_count; i++) {
         if (kernel.processes[i].state != PROC_STATE_OFF) {
             kernel.processes[i].state = PROC_STATE_OFF;
@@ -415,9 +396,7 @@ void mpm_shutdown(void) {
     kernel.initialized = false;
 }
 
-/* ============================================================================
- * SYSTEM INFORMATION
- * ============================================================================ */
+ 
 
 time_t mpm_get_uptime(void) {
     if (!kernel.initialized) return 0;

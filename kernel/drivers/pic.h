@@ -1,20 +1,17 @@
-/*
- * ICE Operating System - PIC Header
- * Programmable Interrupt Controller (8259)
- */
+ 
 
 #ifndef ICE_PIC_H
 #define ICE_PIC_H
 
 #include "../types.h"
 
-/* PIC ports */
+ 
 #define PIC1_COMMAND    0x20
 #define PIC1_DATA       0x21
 #define PIC2_COMMAND    0xA0
 #define PIC2_DATA       0xA1
 
-/* IRQ numbers */
+ 
 #define IRQ_TIMER       0
 #define IRQ_KEYBOARD    1
 #define IRQ_CASCADE     2
@@ -32,14 +29,14 @@
 #define IRQ_ATA1        14
 #define IRQ_ATA2        15
 
-/* Initialize PIC */
+ 
 void pic_init(void);
 
-/* Send EOI */
+ 
 void pic_send_eoi(u8 irq);
 
-/* Mask/unmask IRQ */
+ 
 void pic_mask_irq(u8 irq);
 void pic_unmask_irq(u8 irq);
 
-#endif /* ICE_PIC_H */
+#endif  

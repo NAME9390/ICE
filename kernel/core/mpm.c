@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - MPM Kernel Implementation
- * Main Process Manager with Login System
- */
+ 
 
 #include "mpm.h"
 #include "bootval.h"
@@ -22,15 +19,15 @@
 #define MAX_ARGS 16
 #define MAX_PROCESSES 64
 
-/* Process table */
+ 
 static process_t process_table[MAX_PROCESSES];
 static int process_count = 0;
 static ice_pid_t next_pid = 1;
 
-/* Boot time in ticks */
+ 
 static u64 boot_ticks = 0;
 
-/* String comparison */
+ 
 static int strcmp(const char *s1, const char *s2) {
     while (*s1 && *s1 == *s2) {
         s1++;
@@ -39,7 +36,7 @@ static int strcmp(const char *s1, const char *s2) {
     return *(unsigned char*)s1 - *(unsigned char*)s2;
 }
 
-/* String to int */
+ 
 static int atoi(const char *s) {
     int n = 0;
     while (*s >= '0' && *s <= '9') {
@@ -49,7 +46,7 @@ static int atoi(const char *s) {
     return n;
 }
 
-/* Parse command into arguments */
+ 
 static int parse_args(char *input, char **argv) {
     int argc = 0;
     char *p = input;
@@ -68,9 +65,7 @@ static int parse_args(char *input, char **argv) {
     return argc;
 }
 
-/* ============================================================================
- * LOGIN SYSTEM
- * ============================================================================ */
+ 
 
 static bool do_login(void) {
     char username[32];
@@ -82,7 +77,7 @@ static bool do_login(void) {
         tty_getline(username, sizeof(username));
         
         tty_puts("password: ");
-        /* Note: password would be hidden in real impl */
+         
         tty_getline(password, sizeof(password));
         
         uid_t uid = user_login(username, password);
@@ -106,9 +101,7 @@ static bool do_login(void) {
     return false;
 }
 
-/* ============================================================================
- * COMMANDS
- * ============================================================================ */
+ 
 
 static void cmd_help(void) {
     tty_puts("ICE Shell Commands:\n\n");
@@ -238,16 +231,14 @@ static void cmd_gpm(int argc, char **argv) {
     }
 }
 
-/* ============================================================================
- * MPM API
- * ============================================================================ */
+ 
 
 void mpm_init(void) {
     boot_ticks = pit_get_ticks();
     process_count = 0;
     next_pid = 1;
     
-    /* Initialize subsystems */
+     
     user_init();
     apps_init();
     console_init();
@@ -259,10 +250,10 @@ void mpm_shell(void) {
     char input[MAX_INPUT];
     char *argv[MAX_ARGS];
     
-    /* Show login banner */
+     
     sysinfo_print_login_banner();
     
-    /* Login loop */
+     
     while (!do_login()) {
         pit_sleep_ms(2000);
         sysinfo_print_login_banner();
@@ -270,9 +261,9 @@ void mpm_shell(void) {
     
     tty_puts("\nType 'help' for commands, 'apps' for programs.\n\n");
     
-    /* Main shell loop */
+     
     while (1) {
-        /* Print prompt with username */
+         
         user_t *u = user_get_current();
         if (u) {
             if (u->type == USER_TYPE_UPU) {
@@ -302,13 +293,13 @@ void mpm_shell(void) {
         int argc = parse_args(input, argv);
         if (argc == 0) continue;
         
-        /* Try built-in apps first */
+         
         if (apps_find(argv[0])) {
             apps_run(argv[0], argc, argv);
             continue;
         }
         
-        /* Shell commands */
+         
         if (strcmp(argv[0], "help") == 0) {
             cmd_help();
         }

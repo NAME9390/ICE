@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - Unified Shell Entry Point
- * Main entry for the ICE operating system simulation
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +9,7 @@
 #include "mpm/core/mpm.h"
 #include "tty/tty.h"
 
-/* Forward declarations for managers */
+ 
 int pm_main(int argc, char *argv[]);
 int gpm_main(int argc, char *argv[]);
 
@@ -20,9 +17,7 @@ int gpm_main(int argc, char *argv[]);
 #define MAX_INPUT 1024
 #define MAX_ARGS 32
 
-/* ============================================================================
- * SIGNAL HANDLING
- * ============================================================================ */
+ 
 
 static volatile int running = 1;
 
@@ -32,9 +27,7 @@ static void signal_handler(int sig) {
     }
 }
 
-/* ============================================================================
- * COMMAND PARSING
- * ============================================================================ */
+ 
 
 static int parse_command(char *input, char **argv) {
     int argc = 0;
@@ -49,9 +42,7 @@ static int parse_command(char *input, char **argv) {
     return argc;
 }
 
-/* ============================================================================
- * BANNER
- * ============================================================================ */
+ 
 
 static void print_banner(void) {
     printf("\n");
@@ -71,9 +62,7 @@ static void print_banner(void) {
     printf("\n");
 }
 
-/* ============================================================================
- * SHELL COMMANDS
- * ============================================================================ */
+ 
 
 static void cmd_help(void) {
     printf("ICE Shell Commands:\n");
@@ -103,31 +92,29 @@ static void cmd_help(void) {
     printf("\n");
 }
 
-/* ============================================================================
- * MAIN SHELL LOOP
- * ============================================================================ */
+ 
 
 int main(int argc, char *argv[]) {
-    /* Initialize kernel */
+     
     if (mpm_init() != 0) {
         fprintf(stderr, "Error: Failed to initialize MPM kernel\n");
         return 1;
     }
     
-    /* Initialize TTY */
+     
     tty_init();
     
-    /* Run boot validation */
+     
     printf("Running boot validation...\n");
     mpm_validate_system();
     
-    /* Setup signal handler */
+     
     signal(SIGINT, signal_handler);
     
-    /* Print banner */
+     
     print_banner();
     
-    /* Main shell loop */
+     
     char input[MAX_INPUT];
     char *args[MAX_ARGS];
     
@@ -139,24 +126,24 @@ int main(int argc, char *argv[]) {
             break;
         }
         
-        /* Remove trailing newline */
+         
         size_t len = strlen(input);
         if (len > 0 && input[len-1] == '\n') {
             input[len-1] = '\0';
         }
         
-        /* Skip empty lines */
+         
         if (input[0] == '\0') {
             continue;
         }
         
-        /* Parse command */
+         
         int nargs = parse_command(input, args);
         if (nargs == 0) continue;
         
         const char *cmd = args[0];
         
-        /* Dispatch to appropriate handler */
+         
         if (strcmp(cmd, "pm") == 0) {
             pm_main(nargs, args);
         } else if (strcmp(cmd, "gpm") == 0) {
@@ -173,7 +160,7 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    /* Cleanup */
+     
     printf("Shutting down ICE...\n");
     tty_shutdown();
     mpm_shutdown();

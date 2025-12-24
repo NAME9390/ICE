@@ -1,6 +1,4 @@
-/*
- * ICE Operating System - EXT2 Filesystem Driver
- */
+ 
 
 #ifndef ICE_EXT2_H
 #define ICE_EXT2_H
@@ -9,7 +7,7 @@
 
 #define EXT2_SUPER_MAGIC 0xEF53
 
-/* Superblock */
+ 
 typedef struct {
     u32 inodes_count;
     u32 blocks_count;
@@ -37,7 +35,7 @@ typedef struct {
     u16 def_resuid;
     u16 def_resgid;
     
-    /* Extended (dynamic rev) */
+     
     u32 first_ino;
     u16 inode_size;
     u16 block_group_nr;
@@ -49,12 +47,12 @@ typedef struct {
     char last_mounted[64];
     u32 algo_bitmap;
     
-    /* Performance hints */
+     
     u8  prealloc_blocks;
     u8  prealloc_dir_blocks;
     u16 padding1;
     
-    /* Journaling */
+     
     u8  journal_uuid[16];
     u32 journal_inum;
     u32 journal_dev;
@@ -69,7 +67,7 @@ typedef struct {
     u8  reserved[760];
 } ext2_superblock_t;
 
-/* Block Group Descriptor */
+ 
 typedef struct {
     u32 block_bitmap;
     u32 inode_bitmap;
@@ -81,7 +79,7 @@ typedef struct {
     u32 reserved[3];
 } ext2_bg_desc_t;
 
-/* Inode */
+ 
 typedef struct {
     u16 mode;
     u16 uid;
@@ -103,7 +101,7 @@ typedef struct {
     u8  osd2[12];
 } ext2_inode_t;
 
-/* Directory Entry */
+ 
 typedef struct {
     u32 inode;
     u16 rec_len;
@@ -112,7 +110,7 @@ typedef struct {
     char name[];
 } ext2_dir_entry_t;
 
-/* File types */
+ 
 #define EXT2_FT_UNKNOWN  0
 #define EXT2_FT_REG_FILE 1
 #define EXT2_FT_DIR      2
@@ -122,10 +120,10 @@ typedef struct {
 #define EXT2_FT_SOCK     6
 #define EXT2_FT_SYMLINK  7
 
-/* Inodes */
+ 
 #define EXT2_ROOT_INO 2
 
-/* File handle (abstract) */
+ 
 typedef struct {
     u32 inode_num;
     ext2_inode_t inode;
@@ -133,11 +131,11 @@ typedef struct {
     bool valid;
 } ext2_file_t;
 
-/* API */
+ 
 int ext2_init(void);
 ext2_file_t* ext2_open(const char *path);
 int ext2_read(ext2_file_t *file, void *buffer, u32 size);
-int ext2_write(ext2_file_t *file, const void *buffer, u32 size); // User requested Write
+int ext2_write(ext2_file_t *file, const void *buffer, u32 size); 
 void ext2_close(ext2_file_t *file);
 int ext2_create_file(const char *path);
 int ext2_create_dir(const char *path);

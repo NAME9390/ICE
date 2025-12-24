@@ -1,13 +1,11 @@
-/*
- * ICE Operating System - FAT32 Filesystem Header
- */
+ 
 
 #ifndef ICE_FAT32_H
 #define ICE_FAT32_H
 
 #include "../types.h"
 
-/* FAT32 Boot Sector (BPB) */
+ 
 typedef struct __attribute__((packed)) {
     u8  jmp[3];
     u8  oem[8];
@@ -24,7 +22,7 @@ typedef struct __attribute__((packed)) {
     u32 hidden_sectors;
     u32 total_sectors_32;
     
-    /* FAT32 extended */
+     
     u32 fat_size_32;
     u16 ext_flags;
     u16 fs_version;
@@ -40,7 +38,7 @@ typedef struct __attribute__((packed)) {
     u8  fs_type[8];
 } fat32_bpb_t;
 
-/* FAT32 Directory Entry */
+ 
 typedef struct __attribute__((packed)) {
     u8  name[8];
     u8  ext[3];
@@ -57,7 +55,7 @@ typedef struct __attribute__((packed)) {
     u32 file_size;
 } fat32_dir_entry_t;
 
-/* File attributes */
+ 
 #define FAT_ATTR_READ_ONLY  0x01
 #define FAT_ATTR_HIDDEN     0x02
 #define FAT_ATTR_SYSTEM     0x04
@@ -66,7 +64,7 @@ typedef struct __attribute__((packed)) {
 #define FAT_ATTR_ARCHIVE    0x20
 #define FAT_ATTR_LFN        0x0F
 
-/* File handle */
+ 
 typedef struct {
     u32 cluster;
     u32 size;
@@ -74,31 +72,31 @@ typedef struct {
     bool valid;
 } fat32_file_t;
 
-/* Initialize FAT32 filesystem */
+ 
 int fat32_init(void);
 
-/* Open file */
+ 
 fat32_file_t* fat32_open(const char *path);
 
-/* Read from file */
+ 
 int fat32_read(fat32_file_t *file, void *buffer, u32 size);
 
-/* Write to file */
+ 
 int fat32_write(fat32_file_t *file, const void *buffer, u32 size);
 
-/* Create new file */
+ 
 int fat32_create_file(const char *path);
 
-/* Create new directory */
+ 
 int fat32_create_dir(const char *path);
 
-/* Close file */
+ 
 void fat32_close(fat32_file_t *file);
 
-/* Check if filesystem is mounted */
+ 
 bool fat32_is_mounted(void);
 
-/* List directory */
+ 
 int fat32_list_dir(const char *path, void (*callback)(fat32_dir_entry_t *entry));
 
-#endif /* ICE_FAT32_H */
+#endif  

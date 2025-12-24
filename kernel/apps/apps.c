@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - Built-in Applications
- * Renamed to avoid copyright: nano→iced, cat→view
- */
+ 
 
 #include "apps.h"
 #include "apm.h"
@@ -12,17 +9,17 @@
 #include "../mm/pmm.h"
 #include "../fs/fat32.h"
 
-/* String helpers */
+ 
 static int str_cmp(const char *a, const char *b) {
     while (*a && *a == *b) { a++; b++; }
     return *a - *b;
 }
 
-/* Built-in apps table - renamed for originality */
+ 
 static builtin_app_t builtins[] = {
-    {"view",     "Display file contents",       app_cat,      false},  /* was cat */
+    {"view",     "Display file contents",       app_cat,      false},   
     {"echo",     "Print arguments",             app_echo,     false},
-    {"iced",     "ICE text editor",             app_iced,     false},  /* was nano */
+    {"iced",     "ICE text editor",             app_iced,     false},   
     {"ls",       "List directory",              app_ls,       false},
     {"pwd",      "Print working directory",     app_pwd,      false},
     {"whoami",   "Show current user",           app_whoami,   false},
@@ -82,11 +79,9 @@ void apps_list(void) {
     tty_puts("\nUse 'apm list' for installed packages.\n");
 }
 
-/* ============================================================================
- * APP IMPLEMENTATIONS
- * ============================================================================ */
+ 
 
-int app_cat(int argc, char **argv) {  /* Now called 'view' */
+int app_cat(int argc, char **argv) {   
     if (argc < 2) {
         tty_puts("Usage: view <file>\n");
         return 1;
@@ -123,7 +118,7 @@ int app_echo(int argc, char **argv) {
     return 0;
 }
 
-int app_iced(int argc, char **argv) {  /* Now called 'iced' */
+int app_iced(int argc, char **argv) {   
     tty_puts("ICED - ICE Editor v1.0\n");
     tty_puts("======================\n\n");
     
@@ -136,7 +131,7 @@ int app_iced(int argc, char **argv) {  /* Now called 'iced' */
     tty_puts("\nCommands: Ctrl+S = Save, Ctrl+X = Exit, Ctrl+G = Help\n");
     tty_puts("-----------------------------------------------------\n\n");
     
-    /* Simple line-based editor */
+     
     char line[256];
     int line_count = 0;
     
@@ -160,7 +155,7 @@ static void ls_callback(fat32_dir_entry_t *entry) {
     char name[13];
     int j = 0;
     
-    /* Convert 8.3 name to string */
+     
     for (int i = 0; i < 8; i++) {
         if (entry->name[i] != ' ') name[j++] = entry->name[i];
     }
@@ -173,7 +168,7 @@ static void ls_callback(fat32_dir_entry_t *entry) {
     }
     name[j] = 0;
     
-    /* Lowercase for display */
+     
     for (int i = 0; name[i]; i++) {
         if (name[i] >= 'A' && name[i] <= 'Z') name[i] += 32;
     }
@@ -326,7 +321,7 @@ int app_shutdown(int argc, char **argv) {
     return 0;
 }
 
-int app_date(int argc, char **argv) {  /* Now called 'uptime' */
+int app_date(int argc, char **argv) {   
     (void)argc;
     (void)argv;
     
@@ -343,7 +338,7 @@ int app_date(int argc, char **argv) {  /* Now called 'uptime' */
     return 0;
 }
 
-int app_hexdump(int argc, char **argv) {  /* Now called 'hexview' */
+int app_hexdump(int argc, char **argv) {   
     if (argc < 2) {
         tty_puts("Usage: hexview <address> [length]\n");
         return 1;
@@ -387,7 +382,7 @@ int app_hexdump(int argc, char **argv) {  /* Now called 'hexview' */
     return 0;
 }
 
-int app_ip(int argc, char **argv) {  /* Now called 'ifconfig' */
+int app_ip(int argc, char **argv) {   
     (void)argc;
     (void)argv;
     
@@ -412,7 +407,7 @@ int app_ping(int argc, char **argv) {
     return 0;
 }
 
-/* New apps */
+ 
 int app_touch(int argc, char **argv) {
     if (argc < 2) {
         tty_puts("Usage: touch <filename>\n");

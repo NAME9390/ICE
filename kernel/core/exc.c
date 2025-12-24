@@ -1,16 +1,14 @@
-/*
- * ICE Operating System - EXC Executable Format Implementation
- */
+ 
 
 #include "exc.h"
 #include "../drivers/vga.h"
 
-/* Executable registry */
+ 
 static exc_entry_t registry[MAX_EXECUTABLES];
 static int registry_count = 0;
 static exec_id_t next_exec_id = 1;
 
-/* String copy helper */
+ 
 static void str_copy(char *dest, const char *src, int max) {
     int i;
     for (i = 0; i < max - 1 && src[i]; i++) {
@@ -20,7 +18,7 @@ static void str_copy(char *dest, const char *src, int max) {
 }
 
 void exc_init(void) {
-    /* Clear registry */
+     
     for (int i = 0; i < MAX_EXECUTABLES; i++) {
         registry[i].valid = false;
         registry[i].id = 0;
@@ -29,7 +27,7 @@ void exc_init(void) {
     registry_count = 0;
     next_exec_id = 1;
     
-    /* Register built-in executables */
+     
     exc_register("/bin/pm.exc", "pm", EXC_FLAG_NONE);
     exc_register("/bin/gpm.exc", "gpm", EXC_FLAG_NONE);
 }
@@ -39,7 +37,7 @@ exec_id_t exc_register(const char *path, const char *name, u8 flags) {
         return 0;
     }
     
-    /* Find free slot */
+     
     int slot = -1;
     for (int i = 0; i < MAX_EXECUTABLES; i++) {
         if (!registry[i].valid) {
@@ -52,7 +50,7 @@ exec_id_t exc_register(const char *path, const char *name, u8 flags) {
         return 0;
     }
     
-    /* Create entry */
+     
     exc_entry_t *entry = &registry[slot];
     entry->id = next_exec_id++;
     str_copy(entry->path, path, sizeof(entry->path));
@@ -84,7 +82,7 @@ int exc_get_count(void) {
 void exc_list(void (*callback)(exc_entry_t *entry)) {
     for (int i = 0; i < MAX_EXECUTABLES; i++) {
         if (registry[i].valid) {
-            /* Skip hidden entries */
+             
             if (!(registry[i].flags & EXC_FLAG_HIDDEN)) {
                 callback(&registry[i]);
             }
@@ -98,11 +96,11 @@ u32 exc_load(exec_id_t id) {
         return 0;
     }
     
-    /* TODO: Load from filesystem when FAT32 is implemented */
-    /* For now, return a dummy entry point */
+     
+     
     
-    /* Check if it's a built-in */
-    /* Built-ins run in kernel context for now */
+     
+     
     
     return entry->entry_point;
 }

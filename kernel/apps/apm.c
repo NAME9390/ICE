@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - APM (Application Process Manager)
- * Package installation and multi-language compilation
- */
+ 
 
 #include "apm.h"
 #include "apps.h"
@@ -11,12 +8,12 @@
 #include "../core/exc.h"
 #include "../core/user.h"
 
-/* Package registry */
+ 
 static apm_entry_t packages[MAX_PACKAGES];
 static int package_count = 0;
 static u32 next_package_id = 1;
 
-/* String helpers */
+ 
 static int str_cmp(const char *a, const char *b) {
     while (*a && *a == *b) { a++; b++; }
     return *a - *b;
@@ -36,7 +33,7 @@ static int str_len(const char *s) {
     return len;
 }
 
-/* Check if string ends with suffix */
+ 
 static bool str_endswith(const char *s, const char *suffix) {
     int slen = str_len(s);
     int suflen = str_len(suffix);
@@ -44,7 +41,7 @@ static bool str_endswith(const char *s, const char *suffix) {
     return str_cmp(s + slen - suflen, suffix) == 0;
 }
 
-/* Language info table */
+ 
 static const struct {
     const char *ext;
     apm_lang_t lang;
@@ -103,20 +100,20 @@ int apm_install(const char *path) {
         return -1;
     }
     
-    /* Check if .apm package */
+     
     if (!str_endswith(path, ".apm")) {
         tty_puts("apm: Not a valid .apm package.\n");
         return -1;
     }
     
-    /* Open package */
+     
     fat32_file_t *f = fat32_open(path);
     if (!f) {
         tty_printf("apm: Package not found: %s\n", path);
         return -1;
     }
     
-    /* Read header */
+     
     apm_header_t header;
     int n = fat32_read(f, &header, sizeof(header));
     if (n < (int)sizeof(header)) {
@@ -125,14 +122,14 @@ int apm_install(const char *path) {
         return -1;
     }
     
-    /* Verify magic */
+     
     if (header.magic != APM_MAGIC) {
         tty_puts("apm: Invalid package magic.\n");
         fat32_close(f);
         return -1;
     }
     
-    /* Find slot */
+     
     int slot = -1;
     for (int i = 0; i < MAX_PACKAGES; i++) {
         if (!packages[i].installed) {
@@ -147,7 +144,7 @@ int apm_install(const char *path) {
         return -1;
     }
     
-    /* Register package */
+     
     packages[slot].id = next_package_id++;
     str_copy(packages[slot].name, header.name, 32);
     str_copy(packages[slot].path, path, 64);
@@ -167,7 +164,7 @@ int apm_install(const char *path) {
 int apm_setup(const char *source_path) {
     tty_printf("apm: Setting up from source: %s\n", source_path);
     
-    /* Detect language */
+     
     apm_lang_t lang = apm_detect_lang(source_path);
     
     if (lang == LANG_UNKNOWN) {
@@ -178,7 +175,7 @@ int apm_setup(const char *source_path) {
     
     tty_printf("apm: Detected language: %s\n", apm_lang_name(lang));
     
-    /* Extract app name from path */
+     
     const char *name = source_path;
     for (const char *p = source_path; *p; p++) {
         if (*p == '/') name = p + 1;
@@ -193,12 +190,12 @@ int apm_setup(const char *source_path) {
     
     tty_printf("apm: Creating executable: %s.exc\n", app_name);
     
-    /* Compile based on language */
+     
     switch (lang) {
         case LANG_C:
         case LANG_CPP:
             tty_puts("apm: Compiling C/C++ source...\n");
-            /* In real impl: invoke ICE compiler */
+             
             break;
             
         case LANG_ASM_X86:
@@ -208,7 +205,7 @@ int apm_setup(const char *source_path) {
             
         case LANG_PYTHON:
             tty_puts("apm: Creating Python wrapper...\n");
-            /* Bundle with ICE Python interpreter */
+             
             break;
             
         case LANG_RUST:
@@ -223,7 +220,7 @@ int apm_setup(const char *source_path) {
         case LANG_CSS:
         case LANG_JS:
             tty_puts("apm: Bundling web application...\n");
-            /* Bundle with ICE web runtime */
+             
             break;
             
         default:
@@ -231,7 +228,7 @@ int apm_setup(const char *source_path) {
             return -1;
     }
     
-    /* Register in package list */
+     
     int slot = -1;
     for (i = 0; i < MAX_PACKAGES; i++) {
         if (!packages[i].installed) {
@@ -259,7 +256,7 @@ int apm_setup(const char *source_path) {
 }
 
 int apm_run(const char *name, int argc, char **argv) {
-    /* Find package */
+     
     apm_entry_t *pkg = apm_get(name);
     if (!pkg) {
         tty_printf("apm: Package '%s' not found.\n", name);
@@ -268,7 +265,7 @@ int apm_run(const char *name, int argc, char **argv) {
     
     tty_printf("apm: Running '%s' (%s)...\n", pkg->name, apm_lang_name(pkg->lang));
     
-    /* Execute based on language */
+     
     switch (pkg->lang) {
         case LANG_C:
         case LANG_CPP:
@@ -278,19 +275,19 @@ int apm_run(const char *name, int argc, char **argv) {
         case LANG_GOLANG:
         case LANG_EXC:
             tty_puts("[Running native executable...]\n");
-            /* In real impl: load and execute EXC */
+             
             break;
             
         case LANG_PYTHON:
             tty_puts("[Starting Python interpreter...]\n");
-            /* In real impl: run ICE Python */
+             
             break;
             
         case LANG_HTML:
         case LANG_CSS:
         case LANG_JS:
             tty_puts("[Starting web runtime...]\n");
-            /* In real impl: run ICE web viewer */
+             
             break;
             
         default:
@@ -356,7 +353,7 @@ apm_entry_t* apm_get(const char *name) {
     return 0;
 }
 
-/* APM CLI command handler */
+ 
 int app_apm(int argc, char **argv) {
     if (argc < 2) {
         tty_puts("APM - Application Process Manager\n\n");

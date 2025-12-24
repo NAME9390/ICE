@@ -1,17 +1,15 @@
-/*
- * ICE Operating System - VGA Text Mode Implementation
- */
+ 
 
 #include "vga.h"
 #include <stdarg.h>
 
-/* VGA state */
+ 
 static u16 *vga_buffer;
 static int cursor_x = 0;
 static int cursor_y = 0;
 static u8 current_color;
 
-/* I/O helpers */
+ 
 static inline void outb(u16 port, u8 value) {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
@@ -22,17 +20,17 @@ static inline u8 inb(u16 port) {
     return ret;
 }
 
-/* Create VGA entry */
+ 
 static u16 vga_entry(char c, u8 color) {
     return (u16)c | ((u16)color << 8);
 }
 
-/* Make color byte */
+ 
 static u8 vga_make_color(vga_color_t fg, vga_color_t bg) {
     return fg | (bg << 4);
 }
 
-/* Update hardware cursor */
+ 
 static void update_cursor(void) {
     u16 pos = cursor_y * VGA_WIDTH + cursor_x;
     
@@ -67,14 +65,14 @@ void vga_clear(void) {
 }
 
 void vga_scroll(void) {
-    /* Move all lines up by one */
+     
     for (int y = 0; y < VGA_HEIGHT - 1; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
             vga_buffer[y * VGA_WIDTH + x] = vga_buffer[(y + 1) * VGA_WIDTH + x];
         }
     }
     
-    /* Clear last line */
+     
     for (int x = 0; x < VGA_WIDTH; x++) {
         vga_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', current_color);
     }
@@ -100,13 +98,13 @@ void vga_putc(char c) {
         cursor_x++;
     }
     
-    /* Wrap line */
+     
     if (cursor_x >= VGA_WIDTH) {
         cursor_x = 0;
         cursor_y++;
     }
     
-    /* Scroll if needed */
+     
     if (cursor_y >= VGA_HEIGHT) {
         vga_scroll();
     }
@@ -120,7 +118,7 @@ void vga_puts(const char *s) {
     }
 }
 
-/* Simple number to string */
+ 
 static void print_int(int n, int base, bool sign) {
     char buf[32];
     int i = 0;
@@ -211,11 +209,11 @@ void vga_get_cursor(int *x, int *y) {
 void vga_cursor_enable(bool enable) {
     if (enable) {
         outb(0x3D4, 0x0A);
-        outb(0x3D5, (inb(0x3D5) & 0xC0) | 14);  /* Start line 14 */
+        outb(0x3D5, (inb(0x3D5) & 0xC0) | 14);   
         outb(0x3D4, 0x0B);
-        outb(0x3D5, (inb(0x3D5) & 0xE0) | 15);  /* End line 15 */
+        outb(0x3D5, (inb(0x3D5) & 0xE0) | 15);   
     } else {
         outb(0x3D4, 0x0A);
-        outb(0x3D5, 0x20);  /* Disable cursor */
+        outb(0x3D5, 0x20);   
     }
 }

@@ -1,4 +1,4 @@
-/* Sample ICE program: Hello World */
+ 
 #include <stdio.h>
 
 int main(void) {

@@ -1,23 +1,21 @@
-/*
- * ICE Operating System - TTY Implementation
- */
+ 
 
 #include "tty.h"
 #include "../drivers/vga.h"
 #include "../drivers/keyboard.h"
 #include <stdarg.h>
 
-/* TTY state */
+ 
 static int current_scheme = TTY_SCHEME_DEFAULT;
 static const char *current_prompt = "ice> ";
 
-/* Color scheme definitions: {fg, bg} */
+ 
 static const int schemes[5][2] = {
-    {VGA_COLOR_WHITE, VGA_COLOR_BLACK},         /* Unused */
-    {VGA_COLOR_WHITE, VGA_COLOR_BLACK},         /* Default */
-    {VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK},   /* Dark/Matrix */
-    {VGA_COLOR_BLACK, VGA_COLOR_WHITE},         /* Light */
-    {VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK},    /* Mono */
+    {VGA_COLOR_WHITE, VGA_COLOR_BLACK},          
+    {VGA_COLOR_WHITE, VGA_COLOR_BLACK},          
+    {VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK},    
+    {VGA_COLOR_BLACK, VGA_COLOR_WHITE},          
+    {VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK},     
 };
 
 void tty_init(void) {

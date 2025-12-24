@@ -1,7 +1,4 @@
-/*
- * ICE Operating System - Executable Registry
- * Manages the persistent registry of executables
- */
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,11 +9,9 @@
 #include "../../mpm/core/mpm.h"
 
 #define REGISTRY_FILE "/home/delta/basement/ice/EXC/registry/registry.db"
-#define REGISTRY_MAGIC 0x52454749  /* "REGI" */
+#define REGISTRY_MAGIC 0x52454749   
 
-/* ============================================================================
- * REGISTRY FILE FORMAT
- * ============================================================================ */
+ 
 
 typedef struct {
     uint32_t magic;
@@ -25,9 +20,7 @@ typedef struct {
     uint32_t next_id;
 } registry_header_t;
 
-/* ============================================================================
- * REGISTRY OPERATIONS
- * ============================================================================ */
+ 
 
 static int ensure_registry_dir(void) {
     struct stat st = {0};
@@ -43,7 +36,7 @@ int registry_load(registry_entry_t *entries, int max_entries,
     
     FILE *fp = fopen(REGISTRY_FILE, "rb");
     if (!fp) {
-        /* No registry yet, start fresh */
+         
         *next_id = 1;
         *count = 0;
         return 0;
@@ -117,7 +110,7 @@ int registry_add(registry_entry_t *entries, int *count, uint32_t *next_id,
     entry->type = type;
     entry->valid = true;
     
-    /* Extract name */
+     
     const char *name = strrchr(path, '/');
     name = name ? name + 1 : path;
     strncpy(entry->name, name, sizeof(entry->name) - 1);

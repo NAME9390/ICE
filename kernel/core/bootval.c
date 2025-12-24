@@ -1,13 +1,10 @@
-/*
- * ICE Operating System - Boot Validation
- * Validates kernel files and restores from fallback
- */
+ 
 
 #include "bootval.h"
 #include "../drivers/vga.h"
 #include "../fs/fat32.h"
 
-/* Kernel files to validate */
+ 
 static const char *kernel_files[] = {
     "/EXC/API/process.exc",
     "/EXC/API/exec.exc",
@@ -17,17 +14,17 @@ static const char *kernel_files[] = {
     0
 };
 
-/* Fallback path prefix */
+ 
 static const char *fallback_prefix = "/mpm/krnl/fallback";
 
 void bootval_init(void) {
-    /* Nothing to initialize for now */
+     
 }
 
 bool bootval_check_file(const char *path) {
-    /* Use FAT32 to check if file exists and is readable */
+     
     if (!fat32_is_mounted()) {
-        return true;  /* No disk, assume OK */
+        return true;   
     }
     
     fat32_file_t *f = fat32_open(path);
@@ -39,8 +36,8 @@ bool bootval_check_file(const char *path) {
 }
 
 int bootval_restore(const char *path) {
-    /* In real implementation, copy from fallback to original */
-    /* For now, just report the action */
+     
+     
     (void)path;
     return 0;
 }
@@ -51,7 +48,7 @@ val_result_t bootval_validate(void) {
     vga_puts("ICE Boot Validation\n");
     vga_puts("===================\n\n");
     
-    /* Check if filesystem is available */
+     
     if (!fat32_is_mounted()) {
         vga_puts("No disk mounted. Skipping validation.\n");
         return result;
@@ -60,7 +57,7 @@ val_result_t bootval_validate(void) {
     vga_puts("Checking fallback integrity...\n\n");
     vga_puts("Validating kernel files...\n");
     
-    /* Check each kernel file */
+     
     for (int i = 0; kernel_files[i]; i++) {
         vga_printf("  %s: ", kernel_files[i]);
         result.files_checked++;
@@ -74,7 +71,7 @@ val_result_t bootval_validate(void) {
             vga_puts("MISSING");
             vga_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
             
-            /* Try to restore */
+             
             if (bootval_restore(kernel_files[i]) == 0) {
                 vga_puts(" -> RESTORED\n");
                 result.files_restored++;

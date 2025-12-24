@@ -1,11 +1,8 @@
-/*
- * ICE Operating System - PIC Implementation
- * Programmable Interrupt Controller
- */
+ 
 
 #include "pic.h"
 
-/* I/O helper macros */
+ 
 static inline void outb(u16 port, u8 value) {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
@@ -21,35 +18,35 @@ static inline void io_wait(void) {
 }
 
 void pic_init(void) {
-    /* Save masks */
+     
     u8 mask1 = inb(PIC1_DATA);
     u8 mask2 = inb(PIC2_DATA);
     
-    /* Start initialization sequence */
-    outb(PIC1_COMMAND, 0x11);   /* ICW1: init + ICW4 needed */
+     
+    outb(PIC1_COMMAND, 0x11);    
     io_wait();
     outb(PIC2_COMMAND, 0x11);
     io_wait();
     
-    /* ICW2: Remap IRQs */
-    outb(PIC1_DATA, 0x20);      /* IRQ 0-7 -> INT 32-39 */
+     
+    outb(PIC1_DATA, 0x20);       
     io_wait();
-    outb(PIC2_DATA, 0x28);      /* IRQ 8-15 -> INT 40-47 */
-    io_wait();
-    
-    /* ICW3: Cascading */
-    outb(PIC1_DATA, 0x04);      /* IRQ2 has slave */
-    io_wait();
-    outb(PIC2_DATA, 0x02);      /* Slave ID 2 */
+    outb(PIC2_DATA, 0x28);       
     io_wait();
     
-    /* ICW4: 8086 mode */
+     
+    outb(PIC1_DATA, 0x04);       
+    io_wait();
+    outb(PIC2_DATA, 0x02);       
+    io_wait();
+    
+     
     outb(PIC1_DATA, 0x01);
     io_wait();
     outb(PIC2_DATA, 0x01);
     io_wait();
     
-    /* Restore masks */
+     
     outb(PIC1_DATA, mask1);
     outb(PIC2_DATA, mask2);
 }

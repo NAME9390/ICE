@@ -1,17 +1,15 @@
-/*
- * ICE Operating System - User Account System
- */
+ 
 
 #include "user.h"
 #include "../drivers/vga.h"
 
-/* User table */
+ 
 static user_t users[MAX_USERS];
 static int user_count = 0;
 static uid_t next_uid = 1;
 static uid_t current_uid = UID_INVALID;
 
-/* String helpers */
+ 
 static int str_len(const char *s) {
     int len = 0;
     while (*s++) len++;
@@ -31,7 +29,7 @@ static int str_cmp(const char *a, const char *b) {
     return *a - *b;
 }
 
-/* Simple hash for password (not cryptographically secure) */
+ 
 static u32 simple_hash(const char *s) {
     u32 hash = 5381;
     while (*s) {
@@ -41,7 +39,7 @@ static u32 simple_hash(const char *s) {
 }
 
 void user_init(void) {
-    /* Clear user table */
+     
     for (int i = 0; i < MAX_USERS; i++) {
         users[i].active = false;
         users[i].uid = 0;
@@ -51,10 +49,10 @@ void user_init(void) {
     next_uid = 1;
     current_uid = UID_INVALID;
     
-    /* Create default root account (UPU) */
+     
     user_create("root", "ice", USER_TYPE_UPU);
     
-    /* Create default user account (PU) */
+     
     user_create("user", "user", USER_TYPE_PU);
 }
 
@@ -62,14 +60,14 @@ uid_t user_create(const char *username, const char *password, user_type_t type) 
     if (user_count >= MAX_USERS) return UID_INVALID;
     if (str_len(username) == 0 || str_len(username) >= MAX_USERNAME) return UID_INVALID;
     
-    /* Check if username exists */
+     
     for (int i = 0; i < MAX_USERS; i++) {
         if (users[i].active && str_cmp(users[i].username, username) == 0) {
             return UID_INVALID;
         }
     }
     
-    /* Find free slot */
+     
     int slot = -1;
     for (int i = 0; i < MAX_USERS; i++) {
         if (!users[i].active) {
@@ -84,7 +82,7 @@ uid_t user_create(const char *username, const char *password, user_type_t type) 
     u->uid = next_uid++;
     str_copy(u->username, username, MAX_USERNAME);
     
-    /* Store hashed password */
+     
     u32 hash = simple_hash(password);
     char hash_str[12];
     for (int i = 0; i < 8; i++) {
@@ -104,7 +102,7 @@ uid_t user_create(const char *username, const char *password, user_type_t type) 
 }
 
 uid_t user_login(const char *username, const char *password) {
-    /* Hash the input password */
+     
     u32 hash = simple_hash(password);
     char hash_str[12];
     for (int i = 0; i < 8; i++) {
@@ -113,11 +111,11 @@ uid_t user_login(const char *username, const char *password) {
     }
     hash_str[8] = '\0';
     
-    /* Find user */
+     
     for (int i = 0; i < MAX_USERS; i++) {
         if (users[i].active && str_cmp(users[i].username, username) == 0) {
             if (str_cmp(users[i].password, hash_str) == 0) {
-                /* Login successful */
+                 
                 users[i].logged_in = true;
                 current_uid = users[i].uid;
                 return users[i].uid;
@@ -176,8 +174,8 @@ void user_list(void (*callback)(user_t *user)) {
 
 int user_delete(uid_t uid) {
     if (!user_is_admin()) return -1;
-    if (uid == UID_ROOT) return -1;  /* Can't delete root */
-    if (uid == current_uid) return -1;  /* Can't delete self */
+    if (uid == UID_ROOT) return -1;   
+    if (uid == current_uid) return -1;   
     
     for (int i = 0; i < MAX_USERS; i++) {
         if (users[i].uid == uid) {
@@ -193,7 +191,7 @@ int user_change_password(uid_t uid, const char *old_pw, const char *new_pw) {
     user_t *u = user_get(uid);
     if (!u) return -1;
     
-    /* Verify old password */
+     
     u32 old_hash = simple_hash(old_pw);
     char hash_str[12];
     for (int i = 0; i < 8; i++) {
@@ -203,10 +201,10 @@ int user_change_password(uid_t uid, const char *old_pw, const char *new_pw) {
     hash_str[8] = '\0';
     
     if (str_cmp(u->password, hash_str) != 0) {
-        return -1;  /* Wrong old password */
+        return -1;   
     }
     
-    /* Set new password */
+     
     u32 new_hash = simple_hash(new_pw);
     for (int i = 0; i < 8; i++) {
         hash_str[i] = '0' + ((new_hash >> (i * 4)) & 0xF);
