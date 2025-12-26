@@ -1,73 +1,60 @@
-# ICE Operating System
+# ICE-x86_64-32
 
-Welcome to the **ICE Operating System** project. ICE is a custom kernel and operating system designed for educational purposes and experimental systems development. It features a monolithic kernel architecture with support for modern hardware interfaces, filesystem management, and multitasking.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-##  Features
+ICE is a hobbyist operating system for x86_64 architecture, designed with modularity, multitasking, and modern filesystem support. The project is under active development, featuring a reliable TTY terminal and an experimental graphical interface called Frost.
 
-- **Kernel Architecture**: Monolithic kernel design with protected mode support.
-- **Filesystem Support**: Implementation of **FAT32** with planned transitions to **EXT2** (compatible with EXT4) for improved performance and reliability.
-- **Memory Management**: Paging and heap management.
-- **Networking**: Basic networking stack and driver framework.
-- **Multitasking**: Preemptive multitasking and process management.
-- **Drivers**: Integrated drivers for standard hardware peripherals.
+---
 
-##  Prerequisites
+## Features
 
-To build and run ICE, you need a Linux environment with the following tools installed:
+- **Filesystem:** EXT2  
+- **Boot Interface:**  
+  - TTY Terminal: Fully functional and stable  
+  - GUI "Frost": Experimental; supports apps but may be unstable  
+- **Memory Management:** Paging, heap allocation  
+- **Task Scheduling:** Preemptive multitasking  
+- **Drivers & Networking:** Basic drivers included; networking will first appear in GUI once stable, later integrated with TTY  
+- **Development Tools:** Buildable on Linux with `nasm`, `qemu`, and `grub`
 
-### Arch Linux
-```bash
-sudo pacman -S nasm qemu-full
-```
+---
 
-### Ubuntu/Debian
-```bash
-sudo apt install nasm qemu-system-x86 grub-pc-bin xorriso
-```
+## Development Status
 
-### Fedora
-```bash
-sudo dnf install nasm qemu-system-x86 grub2-tools xorriso
-```
+| Component        | Status                                                                |
+|------------------|-----------------------------------------------------------------------|
+| TTY Terminal     | Stable and fully functional                                           |
+| Frost GUI        | Experimental; may break                                               |
+| EXT2 Filesystem  | Fully integrated                                                      |
+| Networking       | Planned for GUI first; TTY integration later                          |
+| GUI Apps         | Will be prioritized once GUI stabilizes; later ported to TTY          |
 
-##  Building and Running
+---
 
-The project includes a `Makefile` to simplify the build process.
+## Build & Run
 
-### Build the Kernel
-To compile the kernel and core components:
-```bash
+1. **Clone the repository (SSH recommended):**  
+   ```bash
+   git clone git@github.com:Definetly-a-username/ICE-X86_64-32.git
+   cd ICE-X86_64-32
+
+    Build the OS:
+
 make
-```
 
-### Run in QEMU (Direct Kernel Boot)
-To quickly test the kernel using QEMU:
-```bash
+Run in QEMU:
+
 make run
-```
 
-### Create Bootable ISO
-To generate a bootable `.iso` image suitable for virtual machines or real hardware:
-```bash
-make iso
-```
+Create bootable ISO:
 
-### Run ISO in QEMU
-To boot the generated ISO image:
-```bash
-make run-iso
-```
+    make iso
 
-##  Contributing
+Contribution
 
-Contributions are welcome! If you're interested in OS development, feel free to fork the repository and submit pull requests.
+Contributions are welcome. Open issues or submit pull requests for bug fixes, features, or documentation improvements.
+License
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+This project is licensed under the GPL-3.0 License
+.
 
-##  License
-
-This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for details.
